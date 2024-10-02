@@ -1,4 +1,6 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Reflection;
+using System.Runtime.Serialization;
+using System.Text;
 
 namespace Reflection.CustomClass
 {
@@ -64,7 +66,17 @@ namespace Reflection.CustomClass
 
         public override string ToString()
         {
-            return $"i1={i1}, i2={i2}, i3={i3}, i4={i4}, i5={i5}";
+            StringBuilder stringBuilder = new StringBuilder(100);
+            var _fields = this.GetType().GetFields(bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).ToList();
+            foreach (var field in _fields)
+            {
+                stringBuilder.Append(field.Name + "=" +
+                    this.GetType().GetField(field.Name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(this) + ", ");
+            }
+
+            stringBuilder.Remove(stringBuilder.Length - 2, 1);
+
+            return stringBuilder.ToString();
         }
     }
 }
